@@ -1,6 +1,1 @@
 @Momos.Server_HostAddress = http://localhost:5254
-
-GET {{Momos.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
