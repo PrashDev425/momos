@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using Momos.Server.Data;
 using Momos.Server.Services.TokenService;
 using Momos.Server.Services.TokenService.Interface;
+using Momos.Server.UnitOfWork;
+using Momos.Server.UnitOfWork.Interface;
 using System.Text;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -26,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection"))
 );
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
