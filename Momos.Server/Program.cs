@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Momos.Server.Data;
+using Momos.Server.Extentions;
 using Momos.Server.Services.TokenService;
 using Momos.Server.Services.TokenService.Interface;
 using Momos.Server.UnitOfWork;
@@ -18,69 +20,54 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     WebRootPath = environment == "Production" ? "wwwroot" : ""
 });
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
+ConfigureServices(builder.Services);
 
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection"))
-);
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var config = builder.Configuration;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = config["Jwt:Issuer"],
-            ValidAudience = config["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!))
-        };
-    });
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen(c =>
+void ConfigureServices(IServiceCollection services)
 {
-    c.SwaggerDoc("v1", new() { Title = "Momos API", Version = "v1" });
-
-    // Add JWT Authentication
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection")));
+    services.Configure<ApiBehaviorOptions>(options =>
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        options.SuppressModelStateInvalidFilter = true;
     });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    services.AddSwaggerGen(c => {
+        c.SwaggerDoc("v1", new()
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
+            Title = "Momos API",
+            Version = "v1"
+        });
+
+        // Add JWT Authentication
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+          new OpenApiSecurityScheme {
+            Reference = new OpenApiReference {
+              Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+          },
+          new string[] {}
         }
+      });
     });
-});
+    services.AddControllers();
+    services.AddUnitOfWork();
+    services.AddJwtAuthentication(builder.Configuration);
+    services.AddServices();
+}
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
+app.UseHttpLog();
 app.UseDefaultFiles();
 app.MapStaticAssets();
 if (app.Environment.IsDevelopment())
