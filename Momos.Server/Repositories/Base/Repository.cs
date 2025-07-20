@@ -40,9 +40,9 @@ namespace Momos.Server.Repositories.Base
 
         public virtual async Task<List<TEntity>> ListAsync(int page, int pageSize) => await _context.Set<TEntity>().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-        public virtual TEntity? Find(long id) => _context.Set<TEntity>().Find(id);
+        public virtual TEntity? Find(int id) => _context.Set<TEntity>().Find(id);
 
-        public virtual async Task<TEntity?> FindAsync(long id) => await _context.Set<TEntity>().FindAsync(id);
+        public virtual async Task<TEntity?> FindAsync(int id) => await _context.Set<TEntity>().FindAsync(id);
 
         public virtual DbSet<TEntity> Set() => _context.Set<TEntity>();
 

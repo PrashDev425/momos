@@ -44,10 +44,10 @@ namespace Momos.Server.Repositories.Base.Interface
         Task<List<TEntity>> ListAsync(int page, int pageSize);
 
         // Returns an entity of type TEntity by its primary key from the database.
-        TEntity? Find(long id);
+        TEntity? Find(int id);
 
         // Returns an entity of type TEntity by its primary key from the database asynchronously.
-        Task<TEntity?> FindAsync(long id);
+        Task<TEntity?> FindAsync(int id);
 
         // Returns the DbSet for the specified entity type TEntity from the DbContext.
         DbSet<TEntity> Set();

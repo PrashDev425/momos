@@ -38,5 +38,6 @@ namespace Momos.Server.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Momo> Momos { get; set; }
     }
 }

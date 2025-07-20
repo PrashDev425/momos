@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Momos.Server.Services.FileService;
+using Momos.Server.Services.FileService.Interface;
 using Momos.Server.Services.TokenService;
 using Momos.Server.Services.TokenService.Interface;
 using Momos.Server.UnitOfWork.Interface;
@@ -37,6 +39,7 @@ namespace Momos.Server.Extentions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IFileService, FileService>();
             return services;
         }
     }

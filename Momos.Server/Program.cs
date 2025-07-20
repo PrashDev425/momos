@@ -1,24 +1,18 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Momos.Server.Data;
 using Momos.Server.Extentions;
-using Momos.Server.Services.TokenService;
-using Momos.Server.Services.TokenService.Interface;
-using Momos.Server.UnitOfWork;
-using Momos.Server.UnitOfWork.Interface;
-using System.Text;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    Args = args,
-    WebRootPath = environment == "Production" ? "wwwroot" : ""
-});
+//var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+//{
+//    Args = args,
+//    WebRootPath = environment == "Production" ? "wwwroot" : ""
+//});
+
+var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);
 
@@ -70,11 +64,11 @@ var app = builder.Build();
 app.UseHttpLog();
 app.UseDefaultFiles();
 app.MapStaticAssets();
+app.UseStaticFiles();
+app.MapOpenApi();
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Momo Api");
