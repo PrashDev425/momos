@@ -2,30 +2,34 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-    const [forecasts, setForecasts] = useState();
+    const [momo, setMomo] = useState([]);
 
     useEffect(() => {
-        populateWeatherData();
+        populateMomoData();
     }, []);
 
-    const contents = forecasts === undefined
+    const contents = momo.length === 0
         ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
         : <table className="table table-striped" aria-labelledby="tableLabel">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                    <th>Tags</th>
                 </tr>
             </thead>
             <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
+                {momo.map(x =>
+                    <tr key={x.id}>
+                        <td>{x.id}</td>
+                        <td>{x.name}</td>
+                        <td>{x.description}</td>
+                        <td>{x.price}</td>
+                        <td><img width="100" height="100" src={x.imagePath} alt={x.name} /></td>
+                        <td>{x.tags}</td>
                     </tr>
                 )}
             </tbody>
@@ -33,17 +37,24 @@ function App() {
 
     return (
         <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
+            <h1 id="tableLabel">Momo List</h1>
+            <p>This component demonstrates fetching momo data from the server.</p>
             {contents}
         </div>
     );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        if (response.ok) {
-            const data = await response.json();
-            setForecasts(data);
+
+    async function populateMomoData() {
+        try {
+            const response = await fetch('api/momos');
+            if (response.ok) {
+                const data = await response.json();
+                console.table(data);
+                setMomo(data);
+            } else {
+                console.error("Failed to fetch:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
         }
     }
 }

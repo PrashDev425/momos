@@ -14,6 +14,7 @@ namespace Momos.Server.UnitOfWork
 
         //-----------[ Add repositories here ]----------
         public IUserRepository Users { get; }
+        public IMomoRepository Momos { get; }
         //----------------------------------------------
 
         public UnitOfWork(AppDbContext context)
@@ -22,6 +23,7 @@ namespace Momos.Server.UnitOfWork
 
             //----------[ Initialize repositories here ]----------
             Users = new UserRepository(_context);
+            Momos = new MomoRepository(_context);
             //----------------------------------------------------
         }
 

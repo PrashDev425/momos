@@ -7,6 +7,7 @@ namespace Momos.Server.UnitOfWork.Interface
     {
         // Repositories
         IUserRepository Users { get; }
+        IMomoRepository Momos { get; }
 
         // Save changes
         int Complete();

@@ -47,10 +47,15 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
+            '^/api/momos': {
                 target,
                 secure: false
-            }
+            },
+            '^/images': {
+                target,
+                changeOrigin: true,
+                secure: false,
+            },
         },
         port: parseInt(env.DEV_SERVER_PORT || '63788'),
         https: {
