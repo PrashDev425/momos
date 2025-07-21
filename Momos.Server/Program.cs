@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using Momos.Server.Data;
 using Momos.Server.Extentions;
 
-var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+//var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 //{

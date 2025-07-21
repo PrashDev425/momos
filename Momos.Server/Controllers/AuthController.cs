@@ -68,6 +68,20 @@ namespace Momos.Server.Controllers
                     if (result == PasswordVerificationResult.Failed)
                         return Unauthorized(new LoginResponse<LoginRequest>(false, "Validation Error", request).AddValidationError("Password", "Invalid password"));
                     var token = _tokenService.CreateToken(user);
+                    Response.Cookies.Append("token", token, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddDays(1)
+                    });
+                    Response.Cookies.Append("role", user.Role, new CookieOptions
+                    {
+                        HttpOnly = false,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddDays(1)
+                    });
                     return Ok(new LoginResponse<LoginRequest>(true, "Login successful", request).SetToken(token));
                 }
                 else
@@ -79,6 +93,21 @@ namespace Momos.Server.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new LoginResponse<LoginRequest>(false, $"Exception : {ex.Message}", request));
+            }
+        }
+
+        [HttpPost("logout")]
+        public ActionResult<ProcessResponse> Logout()
+        {
+            try
+            {
+                Response.Cookies.Delete("token");
+                Response.Cookies.Delete("role");
+                return Ok(new ProcessResponse(true,"Logged out successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ProcessResponse(true, "Logged out successfully"));
             }
         }
     }
