@@ -15,7 +15,6 @@ namespace Momos.Server.Controllers
     {
         private readonly IFileService _fileService;
         private readonly IUnitOfWork _unitOfWork;
-
         public MomosController(IFileService fileService, IUnitOfWork unitOfWork)
         {
             _fileService = fileService;
@@ -71,10 +70,10 @@ namespace Momos.Server.Controllers
                         var pattern4 = tag;
 
                         momos = momos.Where(m => m.Tags != null &&
-                            (EF.Functions.Like(m.Tags, pattern1) ||
-                             EF.Functions.Like(m.Tags, pattern2) ||
-                             EF.Functions.Like(m.Tags, pattern3) ||
-                             m.Tags == pattern4));
+                                    (EF.Functions.Like(m.Tags, pattern1) ||
+                                     EF.Functions.Like(m.Tags, pattern2) ||
+                                     EF.Functions.Like(m.Tags, pattern3) ||
+                                     m.Tags == pattern4));
                     }
                 }
                 return Ok(new QueryResponse<List<Momo>>(true, "Fetched successfully", await momos.ToListAsync()));
