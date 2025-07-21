@@ -490,3 +490,6 @@ $RECYCLE.BIN/
 *.db
 *.sqlite
 *.sqlite3
+
+# Ignore EF Core Migrations
+**/Migrations/

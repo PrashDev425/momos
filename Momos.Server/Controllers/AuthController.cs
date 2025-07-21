@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Momos.Server.Data;
 using Momos.Server.Entities;
 using Momos.Server.Models.Request.Auth;
 using Momos.Server.Models.Response.Auth;

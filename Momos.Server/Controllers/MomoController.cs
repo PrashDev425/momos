@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Momos.Server.DTOs;
 using Momos.Server.Entities;
@@ -22,6 +23,7 @@ namespace Momos.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OperationResponse<Momo>>> Create([FromForm] MomoDto dto)
         {
             try
@@ -52,6 +54,7 @@ namespace Momos.Server.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<QueryResponse<List<Momo>>>> GetAll([FromQuery] string? tags)
         {
             try
@@ -83,6 +86,7 @@ namespace Momos.Server.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<QueryResponse<Momo>>> GetById(int id)
         {
             try
@@ -98,6 +102,7 @@ namespace Momos.Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OperationResponse<Momo>>> Update(int id, [FromForm] MomoDto dto)
         {
             try
@@ -119,7 +124,7 @@ namespace Momos.Server.Controllers
                         momo.ImagePath = await _fileService.SaveImageAsync(dto.Image);
                     }
                     var rowsAffected = await _unitOfWork.CompleteAsync();
-                    return Ok(new OperationResponse<Momo>(false, "Updated successfully", rowsAffected, momo));
+                    return Ok(new OperationResponse<Momo>(true, "Updated successfully", rowsAffected, momo));
                 }
                 else
                 {
@@ -133,6 +138,7 @@ namespace Momos.Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OperationResponse<int>>> Delete(int id)
         {
             try
@@ -143,7 +149,7 @@ namespace Momos.Server.Controllers
                     await _fileService.DeleteImageAsync(momo.ImagePath);
                 _unitOfWork.Momos.Delete(momo);
                 var rowsAffected = await _unitOfWork.CompleteAsync();
-                return BadRequest(new OperationResponse<int>(false, "Deleted sucessfully", rowsAffected, id));
+                return BadRequest(new OperationResponse<int>(true, "Deleted sucessfully", rowsAffected, id));
             }
             catch (Exception ex)
             {
@@ -151,5 +157,4 @@ namespace Momos.Server.Controllers
             }
         }
     }
-
 }
