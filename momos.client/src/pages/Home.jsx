@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-function Home() {
+const Home = () => {
     const [momo, setMomo] = useState([]);
     const [loading, setLoading] = useState(true);
 

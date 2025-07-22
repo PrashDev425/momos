@@ -148,7 +148,7 @@ namespace Momos.Server.Controllers
                     await _fileService.DeleteImageAsync(momo.ImagePath);
                 _unitOfWork.Momos.Delete(momo);
                 var rowsAffected = await _unitOfWork.CompleteAsync();
-                return BadRequest(new OperationResponse<int>(true, "Deleted sucessfully", rowsAffected, id));
+                return Ok(new OperationResponse<int>(true, "Deleted sucessfully", rowsAffected, id));
             }
             catch (Exception ex)
             {

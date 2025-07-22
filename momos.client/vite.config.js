@@ -49,6 +49,12 @@ export default defineConfig({
         proxy: {
             '^/api/momos': {
                 target,
+                changeOrigin: true,
+                secure: false
+            },
+            '^/user': {
+                target,
+                changeOrigin: true,
                 secure: false
             },
             '^/api/auth/login': {

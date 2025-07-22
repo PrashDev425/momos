@@ -22,6 +22,18 @@ namespace Momos.Server.Extentions
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (context.Request.Cookies.ContainsKey("token"))
+                            {
+                                context.Token = context.Request.Cookies["token"];
+                            }
+                            return Task.CompletedTask;
+                        },
+                    };
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -35,6 +47,7 @@ namespace Momos.Server.Extentions
                 });
             return services;
         }
+
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {

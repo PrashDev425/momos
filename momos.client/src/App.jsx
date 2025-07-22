@@ -1,9 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
-import Index from './pages/admin/Index'
 import Login from './pages/admin/Login';
 import Unauthorized from './pages/admin/Unauthorized';
+import PageNotFound from './pages/PageNotFound'
 import ProtectedRoute from './pages/admin/components/ProtectedRoute';
+import MomoList from './pages/admin/momo/MomoList';
+import MomoForm from './pages/admin/momo/MomoForm';
+import MomoDetail from './pages/admin/momo/MomoDetail';
 
 const App = () => {
     return (
@@ -16,11 +19,15 @@ const App = () => {
 
             {/* Protected Admin Routes */}
             <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
-                <Route path="/admin" element={<Index />} />
+                <Route path="/admin/" element={<MomoList />} />
+                <Route path="/admin/momo" element={<MomoList />} />
+                <Route path="/admin/momo/create" element={<MomoForm />} />
+                <Route path="/admin/momo/edit/:id" element={<MomoForm />} />
+                <Route path="/admin/momo/detail/:id" element={<MomoDetail />} />
             </Route>
 
             {/* Catch-all route */}
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<PageNotFound />} />
         </Routes>
     );
 };
