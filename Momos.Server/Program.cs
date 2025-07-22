@@ -61,7 +61,6 @@ void ConfigureServices(IServiceCollection services)
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
-//app.UseCors("AllowFrontendWithCookies");
 app.UseHttpLog();
 app.UseDefaultFiles();
 app.MapStaticAssets();
