@@ -1,28 +1,21 @@
 import { Navigate, Outlet } from 'react-router-dom';
-
-const getRoleFromCookie = () => {
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('role='));
-  return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
-};
+import { useUser } from '../../../contexts/UserContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const role = getRoleFromCookie();
+    const { user, loading } = useUser();
 
-  if (!role) return <Navigate to="admin/login" replace />;
+    // Show nothing or a loader while user info is loading
+    if (loading) return null;
 
-  try {
-    console.log(role);
-    if (allowedRoles.includes(role)) {
-      return <Outlet />;
-    } else {
-      return <Navigate to="/admin/unauthorized" replace />;
+    if (!user) {
+        return <Navigate to="/admin/login" replace />;
     }
-  } catch (err) {
-    console.error('Token decoding error:', err);
-    return <Navigate to="admin/login" replace />;
-  }
+
+    if (allowedRoles.includes(user.role)) {
+        return <Outlet />;
+    } else {
+        return <Navigate to="/admin/unauthorized" replace />;
+    }
 };
 
 export default ProtectedRoute;

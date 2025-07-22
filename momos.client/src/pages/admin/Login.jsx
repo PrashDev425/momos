@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../contexts/UserContext';
 import logo from '../../assets/Momo.svg';
-import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { setUser } = useUser();
+
     const [form, setForm] = useState({ username: '', password: '' });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState('');
 
+    const toCamelCase = (str) => str.charAt(0).toLowerCase() + str.slice(1);
+
     const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSubmit = async (e) => {
@@ -25,28 +29,48 @@ const Login = () => {
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             });
 
-            const result = await response.json();
+            let result = {};
+            try {
+                result = await response.json();
+            } catch (err) {
+                console.error("Invalid JSON:", err);
+            }
 
             if (response.ok && result.status) {
-                const decoded = jwtDecode(result.token);
-                const role = decoded.role || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-                if (role === 'Admin') {
-                    navigate('/admin');
-                } else if (role === 'User') {
-                    navigate('/');
+                // Fetch user info
+                const userRes = await fetch('/user', { credentials: 'include' });
+
+                if (userRes.ok) {
+                    const userInfo = await userRes.json();
+                    setUser(userInfo);
+
+                    if (userInfo.role === 'Admin') {
+                        navigate('/admin/momo');
+                    } else {
+                        navigate('/');
+                    }
                 } else {
-                    navigate('/');
+                    setMessage('Login succeeded, but failed to fetch user info.');
                 }
             } else {
-                setMessage(result.message || 'Login failed');
-                setErrors(result.validationErrors || {});
+                // Handle validation errors
+                if (result?.hasValidationErrors && result?.validationErrors) {
+                    const fixedErrors = {};
+                    for (const key in result.validationErrors) {
+                        fixedErrors[toCamelCase(key)] = result.validationErrors[key];
+                    }
+                    setErrors(fixedErrors);
+                } else {
+                    setMessage(result?.message || `Request failed with status ${response.status}`);
+                }
             }
         } catch (err) {
+            console.error(err);
             setMessage('An unexpected error occurred.');
-            console.log(err);
         }
     };
 
@@ -60,12 +84,10 @@ const Login = () => {
                 </div>
 
                 <div className="text-center">
-                    <h1 className="text-2xl font-semibold text-gray-800">Sign in to your account</h1>
+                    <h1 className="text-2xl font-semibold text-gray-800">Log in to your account</h1>
                 </div>
 
-                {message && (
-                    <div className="text-sm text-red-600 text-center">{message}</div>
-                )}
+                {message && <div className="text-sm text-red-600 text-center">{message}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-5" aria-label="Login Form">
                     <div>
@@ -79,12 +101,11 @@ const Login = () => {
                             required
                             value={form.username}
                             onChange={handleChange}
-                            className={`mt-1 block w-full px-4 py-2 border ${errors.Username ? 'border-red-500' : 'border-gray-300'
-                                } rounded-lg shadow-sm focus:ring-accent focus:border-accent`}
+                            className={`mt-1 block w-full px-4 py-2 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:ring-accent focus:border-accent`}
                         />
-                        {errors.Username && (
-                            <p className="text-sm text-red-500 mt-1">{errors.Username}</p>
-                        )}
+                        {errors.username && errors.username.map((err, idx) => (
+                            <p key={idx} className="text-sm text-red-500 mt-1">{err}</p>
+                        ))}
                     </div>
 
                     <div>
@@ -98,12 +119,11 @@ const Login = () => {
                             required
                             value={form.password}
                             onChange={handleChange}
-                            className={`mt-1 block w-full px-4 py-2 border ${errors.Password ? 'border-red-500' : 'border-gray-300'
-                                } rounded-lg shadow-sm focus:ring-accent focus:border-accent`}
+                            className={`mt-1 block w-full px-4 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:ring-accent focus:border-accent`}
                         />
-                        {errors.Password && (
-                            <p className="text-sm text-red-500 mt-1">{errors.Password}</p>
-                        )}
+                        {errors.password && errors.password.map((err, idx) => (
+                            <p key={idx} className="text-sm text-red-500 mt-1">{err}</p>
+                        ))}
                     </div>
 
                     <div>

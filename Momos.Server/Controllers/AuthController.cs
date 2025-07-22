@@ -71,15 +71,8 @@ namespace Momos.Server.Controllers
                     Response.Cookies.Append("token", token, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = DateTimeOffset.UtcNow.AddDays(1)
-                    });
-                    Response.Cookies.Append("role", user.Role, new CookieOptions
-                    {
-                        HttpOnly = false,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
+                        Secure = true, // Required for SameSite=None
+                        SameSite = SameSiteMode.None, // Allow cross-origin requests
                         Expires = DateTimeOffset.UtcNow.AddDays(1)
                     });
                     return Ok(new LoginResponse<LoginRequest>(true, "Login successful", request).SetToken(token));
@@ -102,12 +95,11 @@ namespace Momos.Server.Controllers
             try
             {
                 Response.Cookies.Delete("token");
-                Response.Cookies.Delete("role");
                 return Ok(new ProcessResponse(true,"Logged out successfully"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ProcessResponse(true, "Logged out successfully"));
+                return StatusCode(500, new ProcessResponse(true, $"Exception : {ex.Message}"));
             }
         }
     }
